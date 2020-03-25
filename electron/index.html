@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <script src="./geckos.io-client.1.3.0.min.js"></script>
+  </head>
+  <body>
+    <h1>Add a Number</h1>
+    <p>The server will multiply the number by 2.</p>
+    <form>
+      <input type="number" id="number" placeholder="Enter a Number" />
+      <input type="submit" id="submit" />
+    </form>
+    <ul id="list"></ul>
+    <script>
+      // set the url http://localhost
+      // otherwise it will be file://
+      const channel = geckos({ url: 'http://localhost' })
+
+      channel.onConnect(error => {
+        if (error) {
+          console.error(error.message)
+          return
+        }
+
+        channel.on('answer', data => {
+          console.log(`you got the answer ${data}`)
+          const list = document.getElementById('list')
+          const node = document.createElement('li')
+          const textnode = document.createTextNode(data)
+          node.appendChild(textnode)
+          list.appendChild(node)
+        })
+
+        document.getElementById('submit').addEventListener('click', event => {
+          event.preventDefault()
+          const number = document.getElementById('number').value
+          channel.emit('number', number)
+        })
+      })
+    </script>
+  </body>
+</html>
